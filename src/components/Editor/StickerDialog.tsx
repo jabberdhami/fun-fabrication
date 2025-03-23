@@ -26,7 +26,7 @@ export const StickerDialog: React.FC = () => {
           <span className="tooltip bottom-full left-1/2 transform -translate-x-1/2 mb-1">Add Sticker</span>
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Add Sticker</DialogTitle>
         </DialogHeader>
