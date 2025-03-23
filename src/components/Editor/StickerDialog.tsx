@@ -10,8 +10,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sticker } from 'lucide-react';
 import { StickerSelector } from './StickerSelector';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const StickerDialog: React.FC = () => {
+  const isMobile = useIsMobile();
+  
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -26,8 +29,10 @@ export const StickerDialog: React.FC = () => {
           <span className="tooltip bottom-full left-1/2 transform -translate-x-1/2 mb-1">Add Sticker</span>
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-hidden p-0">
-        <DialogHeader className="px-4 pt-4 pb-2">
+      <DialogContent 
+        className={`${isMobile ? 'w-[95vw] max-w-none' : 'sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-[65vw]'} max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl`}
+      >
+        <DialogHeader className="px-4 pt-4 pb-2 sticky top-0 bg-background z-10 border-b">
           <DialogTitle className="text-xl font-bold">Add Sticker</DialogTitle>
         </DialogHeader>
         <StickerSelector />

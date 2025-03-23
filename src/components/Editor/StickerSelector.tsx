@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEditor } from './EditorContext';
 import { toast } from '@/hooks/use-toast';
 import { Gift, ShoppingBag, Heart, Baby, CalendarDays, Smile, Palette, Cat, Square } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StickerCategory {
   name: string;
@@ -20,6 +21,7 @@ export const StickerSelector: React.FC = () => {
   const [categories, setCategories] = useState<StickerCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>('');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // This would typically fetch from an API endpoint that returns sticker categories
@@ -103,30 +105,29 @@ export const StickerSelector: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center p-6">Loading stickers...</div>;
+    return <div className="flex items-center justify-center h-60 p-6">Loading stickers...</div>;
   }
 
   // Find the active category object
   const activeTab = categories.find(cat => cat.name === activeCategory);
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(80vh-70px)]">
-      <div className="px-4 mb-1">
-        <h3 className="text-lg font-semibold">Choose a sticker</h3>
-        <p className="text-sm text-muted-foreground">Select from various categories</p>
-      </div>
-      
-      <Tabs value={activeCategory} onValueChange={setActiveCategory} className="flex flex-col h-full">
-        <div className="px-4">
+    <div className="flex flex-col h-full overflow-hidden">
+      <Tabs 
+        value={activeCategory} 
+        onValueChange={setActiveCategory} 
+        className="flex flex-col h-full overflow-hidden"
+      >
+        <div className="px-4 py-2 bg-background/95 sticky top-0 z-10 backdrop-blur-sm border-b">
           <ScrollArea className="w-full" type="always">
-            <TabsList className="w-full h-12 bg-muted/50 flex flex-nowrap p-1.5 rounded-lg">
+            <TabsList className={`w-full ${isMobile ? 'h-auto flex-wrap' : 'h-12'} bg-muted/50 flex p-1.5 rounded-lg`}>
               {categories.map((category) => (
                 <TabsTrigger 
                   key={category.name} 
                   value={category.name}
-                  className={`text-sm px-3 py-1.5 rounded-md whitespace-nowrap flex items-center min-w-fit ${
-                    activeCategory === category.name ? category.color || '' : ''
-                  }`}
+                  className={`text-sm px-3 py-1.5 my-0.5 rounded-md flex items-center min-w-fit ${
+                    activeCategory === category.name ? `${category.color || ''} shadow-sm` : ''
+                  } transition-all duration-200`}
                 >
                   {category.icon}
                   {category.name}
@@ -136,25 +137,27 @@ export const StickerSelector: React.FC = () => {
           </ScrollArea>
         </div>
         
-        <div className="flex-grow overflow-hidden px-4 py-3">
+        <div className="flex-1 overflow-hidden p-2">
           {categories.map((category) => (
             <TabsContent 
               key={category.name} 
               value={category.name} 
-              className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col"
+              className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col overflow-hidden"
             >
-              <div className={`p-2 rounded-lg mb-3 ${category.color || 'bg-muted/30'} flex items-center`}>
+              <div className={`p-2 rounded-lg mb-2 ${category.color || 'bg-muted/30'} flex items-center shadow-sm`}>
                 {category.icon}
-                <h4 className="font-medium">{category.name} Stickers</h4>
+                <h4 className="font-medium ml-1">{category.name} Stickers</h4>
               </div>
               
               <ScrollArea className="flex-grow rounded-md border">
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 p-3">
+                <div className={`grid grid-cols-2 ${isMobile ? '' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} gap-3 p-3`}>
                   {category.stickers.map((sticker, index) => (
                     <Button
                       key={index}
                       variant="outline"
-                      className="p-2 h-24 aspect-square flex items-center justify-center hover:bg-muted hover:border-primary/20 transition-all duration-200 overflow-hidden"
+                      className={`p-2 ${isMobile ? 'h-20' : 'h-24'} aspect-square flex items-center justify-center 
+                        hover:bg-muted hover:border-primary/20 transition-all duration-200 overflow-hidden
+                        hover:shadow-md focus:shadow-md`}
                       onClick={() => handleStickerClick(sticker)}
                     >
                       <img 
