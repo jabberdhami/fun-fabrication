@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { Canvas, Object as FabricObject, Image, IObjectOptions } from 'fabric';
+import { fabric } from 'fabric';
 import { toast } from '@/hooks/use-toast';
 
 export interface CanvasSize {
@@ -20,10 +19,10 @@ export const CANVAS_SIZES: CanvasSize[] = [
 ];
 
 interface EditorContextProps {
-  canvas: Canvas | null;
-  setCanvas: (canvas: Canvas | null) => void;
-  selectedObject: FabricObject | null;
-  setSelectedObject: (object: FabricObject | null) => void;
+  canvas: fabric.Canvas | null;
+  setCanvas: (canvas: fabric.Canvas | null) => void;
+  selectedObject: fabric.Object | null;
+  setSelectedObject: (object: fabric.Object | null) => void;
   backgroundColor: string;
   setBackgroundColor: (color: string) => void;
   currentCanvasSize: CanvasSize;
@@ -39,6 +38,7 @@ interface EditorContextProps {
   addRect: () => void;
   addCircle: () => void;
   addImage: (url: string) => Promise<void>;
+  addSticker: (url: string) => Promise<void>;
   deleteSelected: () => void;
   bringForward: () => void;
   sendBackward: () => void;
@@ -47,7 +47,7 @@ interface EditorContextProps {
   duplicateSelected: () => void;
   downloadCanvas: (format: 'png' | 'jpeg') => void;
   clearCanvas: () => void;
-  updateObjectProps: (props: Partial<IObjectOptions>) => void;
+  updateObjectProps: (props: Partial<fabric.IObjectOptions>) => void;
 }
 
 export const EditorContext = createContext<EditorContextProps>({} as EditorContextProps);
@@ -59,8 +59,8 @@ interface EditorProviderProps {
 }
 
 export const EditorProvider: React.FC<EditorProviderProps> = ({ children }) => {
-  const [canvas, setCanvas] = useState<Canvas | null>(null);
-  const [selectedObject, setSelectedObject] = useState<FabricObject | null>(null);
+  const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
+  const [selectedObject, setSelectedObject] = useState<fabric.Object | null>(null);
   const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
   const [currentCanvasSize, setCurrentCanvasSize] = useState<CanvasSize>(CANVAS_SIZES[0]);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
@@ -257,6 +257,43 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({ children }) => {
     }
   }, [canvas, saveToHistory]);
 
+  // Add sticker function - similar to addImage but optimized for stickers
+  const addSticker = useCallback(async (url: string) => {
+    if (!canvas) return;
+    
+    try {
+      fabric.Image.fromURL(url, (img) => {
+        // Scale down if sticker is too large, but keep it a bit bigger than normal images
+        const maxDimension = Math.min(canvas.width!, canvas.height!) * 0.3;
+        const scale = img.width && img.height 
+          ? img.width > img.height 
+            ? maxDimension / img.width 
+            : maxDimension / img.height
+          : 0.3;
+        
+        img.scale(scale);
+        img.set({
+          left: canvas.width! / 2,
+          top: canvas.height! / 2,
+          originX: 'center',
+          originY: 'center'
+        });
+        
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        canvas.renderAll();
+        saveToHistory();
+      }, { crossOrigin: 'anonymous' });
+    } catch (error) {
+      console.error('Failed to add sticker:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add the sticker to canvas',
+        variant: 'destructive'
+      });
+    }
+  }, [canvas, saveToHistory]);
+
   const deleteSelected = useCallback(() => {
     if (!canvas || !selectedObject) return;
     
@@ -270,7 +307,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({ children }) => {
     if (!canvas || !selectedObject) return;
     
     try {
-      selectedObject.clone((cloned: FabricObject) => {
+      selectedObject.clone((cloned: fabric.Object) => {
         cloned.set({
           left: selectedObject.left! + 20,
           top: selectedObject.top! + 20,
@@ -326,7 +363,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({ children }) => {
   }, [canvas, selectedObject, saveToHistory]);
 
   // Update object properties
-  const updateObjectProps = useCallback((props: Partial<IObjectOptions>) => {
+  const updateObjectProps = useCallback((props: Partial<fabric.IObjectOptions>) => {
     if (!canvas || !selectedObject) return;
     
     selectedObject.set(props);
@@ -399,6 +436,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({ children }) => {
     addRect,
     addCircle,
     addImage,
+    addSticker,
     deleteSelected,
     bringForward,
     sendBackward,

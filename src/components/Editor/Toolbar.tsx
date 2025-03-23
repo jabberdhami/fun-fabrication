@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CanvasSizeSelector } from './CanvasSizeSelector';
 import { ColorPicker } from './ColorPicker';
+import { StickerDialog } from './StickerDialog';
 import { useEditor } from './EditorContext';
 import { 
   Undo2, 
@@ -11,7 +12,7 @@ import {
   Type, 
   Square, 
   Circle, 
-  Image as ImageIcon, 
+  Image as ImageIcon,
   Trash2, 
   Download, 
   Copy, 
@@ -145,6 +146,8 @@ export const Toolbar: React.FC = () => {
           label="Add Circle"
           onClick={addCircle}
         />
+        
+        <StickerDialog />
         
         <div className="has-tooltip">
           <label className="cursor-pointer">

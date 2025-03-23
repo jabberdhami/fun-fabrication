@@ -26,8 +26,13 @@ export const EditorHeader: React.FC = () => {
 
   return (
     <header className="flex items-center justify-between p-3 border-b border-border bg-background">
-      <div className="flex items-center">
-        <h1 className="text-lg font-medium">Canvas Editor</h1>
+      <div className="flex items-center gap-3">
+        <img 
+          src="/lovable-uploads/94f49e39-8cf7-49bc-908e-c4636d942df2.png" 
+          alt="ITSSS Logo" 
+          className="h-8"
+        />
+        <h1 className="text-lg font-medium">ITSSS Canvas</h1>
       </div>
       
       <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import { Canvas } from '@/components/Editor/Canvas';
 import { Toolbar } from '@/components/Editor/Toolbar';
 import { Sidebar } from '@/components/Editor/Sidebar';
 import { EditorHeader } from '@/components/Editor/EditorHeader';
+import { Footer } from '@/components/Editor/Footer';
 
 const Index = () => {
   return (
@@ -20,6 +21,8 @@ const Index = () => {
             <Sidebar />
           </div>
         </div>
+        
+        <Footer />
       </div>
     </EditorProvider>
   );
