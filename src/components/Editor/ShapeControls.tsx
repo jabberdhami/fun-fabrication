@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useEditor } from './EditorContext';
 import { ColorPicker } from './ColorPicker';
+import { fabric } from 'fabric';
 
 export const ShapeControls: React.FC = () => {
   const { selectedObject, updateObjectProps } = useEditor();
@@ -17,8 +18,8 @@ export const ShapeControls: React.FC = () => {
   const fill = selectedObject.fill as string || '#cccccc';
   const stroke = selectedObject.stroke as string || '#000000';
   const strokeWidth = selectedObject.strokeWidth || 0;
-  const rx = (selectedObject as fabric.Rect).rx || 0;
-  const ry = (selectedObject as fabric.Rect).ry || 0;
+  const rx = selectedObject.type === 'rect' ? (selectedObject as fabric.Rect).rx || 0 : 0;
+  const ry = selectedObject.type === 'rect' ? (selectedObject as fabric.Rect).ry || 0 : 0;
 
   const handleFillChange = (color: string) => {
     updateObjectProps({ fill: color });
@@ -36,7 +37,13 @@ export const ShapeControls: React.FC = () => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= 0) {
       if (selectedObject.type === 'rect') {
-        updateObjectProps({ rx: numValue, ry: numValue });
+        // For rect objects, we need to set rx and ry as custom properties
+        const rectObj = selectedObject as fabric.Rect;
+        rectObj.set({
+          rx: numValue,
+          ry: numValue
+        });
+        selectedObject.canvas?.renderAll();
       }
     }
   };

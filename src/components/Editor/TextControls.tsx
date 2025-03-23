@@ -8,6 +8,7 @@ import { useEditor } from './EditorContext';
 import { ColorPicker } from './ColorPicker';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { fabric } from 'fabric';
 
 const FONT_FAMILIES = [
   'Inter',
@@ -44,34 +45,39 @@ export const TextControls: React.FC = () => {
   const lineHeight = textObject.lineHeight || 1.2;
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateObjectProps({ text: e.target.value });
+    textObject.set({ text: e.target.value });
+    selectedObject.canvas?.renderAll();
   };
 
   const handleFontFamilyChange = (value: string) => {
-    updateObjectProps({ fontFamily: value });
+    textObject.set({ fontFamily: value });
+    selectedObject.canvas?.renderAll();
   };
 
   const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const numValue = parseInt(e.target.value, 10);
     if (!isNaN(numValue) && numValue > 0) {
-      updateObjectProps({ fontSize: numValue });
+      textObject.set({ fontSize: numValue });
+      selectedObject.canvas?.renderAll();
     }
   };
 
-  const handleFontStyleChange = (value: string) => {
+  const handleFontStyleChange = (value: string[]) => {
     const bold = value.includes('bold');
     const italic = value.includes('italic');
     const textUnderline = value.includes('underline');
     
-    updateObjectProps({
+    textObject.set({
       fontWeight: bold ? 'bold' : 'normal',
       fontStyle: italic ? 'italic' : 'normal',
       underline: textUnderline
     });
+    selectedObject.canvas?.renderAll();
   };
 
   const handleTextAlignChange = (value: string) => {
-    updateObjectProps({ textAlign: value });
+    textObject.set({ textAlign: value });
+    selectedObject.canvas?.renderAll();
   };
 
   const handleFillChange = (color: string) => {
@@ -79,11 +85,13 @@ export const TextControls: React.FC = () => {
   };
 
   const handleCharSpacingChange = (value: number[]) => {
-    updateObjectProps({ charSpacing: value[0] });
+    textObject.set({ charSpacing: value[0] });
+    selectedObject.canvas?.renderAll();
   };
 
   const handleLineHeightChange = (value: number[]) => {
-    updateObjectProps({ lineHeight: value[0] });
+    textObject.set({ lineHeight: value[0] });
+    selectedObject.canvas?.renderAll();
   };
 
   // Determine which style buttons are active

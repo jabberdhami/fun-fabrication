@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useEditor } from './EditorContext';
 import { Crop, RefreshCw, FlipHorizontal, FlipVertical } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { fabric } from 'fabric';
 
 export const ImageControls: React.FC = () => {
   const { selectedObject, updateObjectProps } = useEditor();
